@@ -5,6 +5,7 @@ var chatPage = document.querySelector('#chat-page');
 var usernameForm = document.querySelector('#usernameForm');
 var messageForm = document.querySelector('#messageForm');
 var messageInput = document.querySelector('#message');
+var privateInput = document.querySelector('#private');
 var messageArea = document.querySelector('#messageArea');
 var connectingElement = document.querySelector('.connecting');
 
@@ -35,6 +36,7 @@ function connect(event) {
 function onConnected() {
     // Subscribe to the Public Topic
     stompClient.subscribe('/topic/public', onMessageReceived);
+    stompClient.subscribe('/topic/private.' + username, onMessageReceived);
 
     // Tell your username to the server
     stompClient.send("/app/chat/user",
@@ -54,14 +56,23 @@ function onError(error) {
 
 function sendMessage(event) {
     var messageContent = messageInput.value.trim();
+    var user = privateInput.value.trim();
     if(messageContent && stompClient) {
         var chatMessage = {
             sender: username,
             content: messageInput.value,
             type: 'CHAT'
         };
-        stompClient.send("/app/chat/message", {}, JSON.stringify(chatMessage));
+
+        if(user){
+            stompClient.send("/app/chat/private." + user, {}, JSON.stringify(chatMessage));
+        }
+        else {
+            stompClient.send("/app/chat/message", {}, JSON.stringify(chatMessage));
+        }
+
         messageInput.value = '';
+        privateInput.value = '';
     }
     event.preventDefault();
 }

@@ -3,6 +3,9 @@ package com.websocket.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Getter
 @Setter
 public class ChatMessage {
@@ -16,7 +19,12 @@ public class ChatMessage {
         LEAVE
     }
 
-    public void addTime(String time){
-        this.content = time + ": " +content;
+    public void addTime(){
+        String time = new SimpleDateFormat("HH:mm").format(new Date());
+        this.content = time + ": " + content;
+    }
+
+    public void setPrivate(){
+        this.content = "PRIVATE -> " + content;
     }
 }
